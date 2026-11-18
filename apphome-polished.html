@@ -1,0 +1,113 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>AppHome</title><style>
+*{box-sizing:border-box}body{margin:0;background:#101319;color:#ecedf0;font:15px system-ui,-apple-system,sans-serif}button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;background:#242a34;border:1px solid #353c48;border-radius:10px;padding:10px 14px}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #91b7ff}header{display:flex;align-items:center;gap:10px;padding:20px max(18px,env(safe-area-inset-right));padding-top:max(20px,env(safe-area-inset-top))}h1{font-size:22px;margin:0 auto 0 0;letter-spacing:-.7px}input,textarea{background:#191e26;border:1px solid #343b46;border-radius:10px;padding:12px;color:inherit;font-size:16px;width:100%}#search{margin:8px 18px;width:calc(100% - 36px)}#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:24px 12px;padding:28px 18px;max-width:1000px}.tile{border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:9px}.icon{display:grid;place-items:center;width:64px;height:64px;border-radius:17px;font-size:27px;background:var(--color,#42669e);box-shadow:inset 0 1px 0 #ffffff25}.label{max-width:88px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#empty{padding:30px;color:#a9b0bd}[hidden]{display:none!important}
+#viewer{position:fixed;inset:0;width:100%;height:100%;height:100dvh;z-index:30;display:flex;flex-direction:column;background:white;overflow:hidden}.bar{flex:0 0 auto;display:flex;align-items:center;gap:8px;background:#101722;color:white;padding:8px 10px;padding-top:calc(8px + env(safe-area-inset-top));min-height:56px}.bar strong{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.bar button{padding:8px 11px;min-height:38px}.frame-slot{position:relative;flex:1 1 0%;min-height:0;min-width:0;overflow:hidden;background:white}#appFrame{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;border:0!important;margin:0!important;padding:0!important;background:white}
+#editor{position:fixed;inset:0;z-index:20;background:#101319;display:flex;flex-direction:column;height:100%;height:100dvh}.editor-body{overflow:auto;flex:1;min-height:0;padding:18px;max-width:1000px;width:100%;margin:auto}label{display:block;color:#aeb7c5;font-size:12px;margin:0 0 7px}.fields{display:grid;grid-template-columns:1fr 80px 65px;gap:12px;margin-bottom:18px}input[type=color]{padding:4px;height:46px}#drop{border:1px dashed #566171;border-radius:12px;padding:18px;display:flex;align-items:center;gap:12px;margin-bottom:16px;color:#aeb7c5}#drop.over{border-color:#96bcff;background:#1b2a41}#drop span{flex:1;font-size:13px}.tabs{display:flex;gap:8px;margin:14px 0;flex-wrap:wrap}.active{background:#35547f}textarea{height:46vh;min-height:240px;font:13px/1.6 ui-monospace,monospace;white-space:pre;resize:vertical}#previewBox{position:relative;height:68vh;min-height:350px;background:white;border-radius:10px;overflow:hidden}#preview{position:absolute;inset:0;width:100%;height:100%;border:0}footer{padding:12px 18px calc(12px + env(safe-area-inset-bottom));display:flex;gap:10px;border-top:1px solid #2b323c}footer button:last-child{margin-left:auto;background:#dbe7fa;color:#162032}.note{color:#a9b2c0;font-size:13px;line-height:1.6}#toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#252d39;padding:12px 20px;border-radius:12px;z-index:50;box-shadow:0 8px 40px #0005;max-width:90vw}button.danger{color:#ffb1ae}body.running{overflow:hidden}@media(max-width:420px){header{flex-wrap:wrap}header button{font-size:13px;padding:9px}#drop{flex-wrap:wrap}.fields{grid-template-columns:1fr 64px 55px}}
+
+/* Visual refinement only: original layout, controls and scripts retained. */
+:root{color-scheme:dark;--page:#101216;--panel:#181c22;--edge:#303640;--ink:#eef0f4;--quiet:#989faa;--focus:#a5bde3}
+body{background:var(--page);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+header{background:#12151a;border-bottom:1px solid #252b33}
+h1{font-weight:650;letter-spacing:-.75px;color:#f2f4f7}
+button{background:#20252d;border-color:#343c48;border-radius:11px;font-weight:550;box-shadow:inset 0 1px 0 #ffffff06,0 1px 2px #00000020;transition:background-color .16s,border-color .16s,box-shadow .16s}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+button:active{background:#303949;box-shadow:inset 0 1px 3px #0003}
+#add{background:#e0e8f3;color:#1a2638;border-color:#e0e8f3;box-shadow:inset 0 1px 0 #fff8,0 2px 5px #0002}
+input,textarea{background:#171b21;border-color:#303640;border-radius:11px;box-shadow:inset 0 1px 2px #0002;caret-color:#b7cbed}
+input::placeholder,textarea::placeholder{color:#737e8d;opacity:1}
+input:focus,textarea:focus{border-color:#819cc1}
+#search{background:#191d24;border-color:#303740;box-shadow:0 2px 5px #0000000d}
+.tile{background:transparent;border:0;box-shadow:none;border-radius:15px}
+.tile:active{background:transparent;box-shadow:none}
+.icon{border-radius:18px;border:1px solid #ffffff18;box-shadow:inset 0 1px 0 #ffffff24,inset 0 -1px 0 #00000012,0 5px 12px #00000022;text-shadow:0 1px 2px #0002;font-weight:550}
+.label{color:#cdd3dd;font-weight:500;letter-spacing:.02px}
+#empty{color:#8e98a7;line-height:1.6}
+.bar{background:#141920;border-bottom:1px solid #303744;box-shadow:0 1px 5px #00000012}
+.bar strong{font-weight:600;letter-spacing:-.15px;color:#edf1f8}
+.bar button{background:#202732;border-color:#343f4f;border-radius:10px;color:#d9e2ef}
+#editor{background:#11151b}
+label{color:#a3adbc;font-weight:600;letter-spacing:.035em}
+#editorTitle{font-weight:600}
+#drop{background:#181e27;border-color:#45536a;border-radius:13px;color:#9facc0}
+#drop.over{background:#22324a;border-color:#a0bbdf;box-shadow:inset 0 0 0 1px #a0bbdf20}
+#upload{background:#263245;border-color:#40516a;color:#e4ecf8}
+.tabs button{color:#a8b4c6;background:#1b222d;border-color:#343f50}
+.tabs .active{background:#344660;color:#f1f5fd;border-color:#546e92;box-shadow:inset 0 1px 0 #ffffff08}
+#expand{background:transparent;border-color:#3b485b;color:#c6d4e9}
+#code{background:#12171e;color:#dce5f1;border-color:#303d4f;border-radius:12px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;tab-size:2}
+#previewBox{border:1px solid #3a4658;box-shadow:0 4px 18px #00000020}
+.note{color:#929fb1}
+footer{background:#141a23;border-color:#303a49;box-shadow:0 -4px 16px #0000000b}
+footer button:last-child{background:#dce6f5;color:#1a2b43;border-color:#dce6f5;font-weight:650;box-shadow:inset 0 1px 0 #ffffff80,0 2px 4px #0002}
+button.danger{color:#eaa6a5;border-color:#684243;background:#332529}
+#clearData{background:transparent;border-color:#654348;color:#dca6aa;font-size:13px}
+#dataInfo{font-size:12px;color:#9aa6b7}
+#toast{background:#263142;border:1px solid #43516a;border-radius:12px;color:#f0f4fb;box-shadow:0 12px 34px #0005;font-size:14px;line-height:1.45}
+@media(hover:hover){button:hover{background:#2b3442;border-color:#526077}.tile:hover{background:transparent}.tile:hover .icon{box-shadow:inset 0 1px 0 #ffffff30,0 7px 18px #0004}#add:hover,footer button:last-child:hover{background:#edf3fc;border-color:#edf3fc;color:#162438}.tabs .active:hover{background:#405776}#clearData:hover{background:#332529}}
+@media(prefers-reduced-motion:reduce){button{transition:none}}
+
+</style></head><body>
+<header><h1>AppHome</h1><button id="backup">Back up</button><button id="restore">Restore</button><button id="add">+ Add app</button></header><input id="search" placeholder="Search your apps" aria-label="Search apps"><main id="grid"></main><p id="empty" hidden>No apps yet. Add an HTML file or paste your code.</p>
+<section id="viewer" hidden><div class="bar"><button id="exit" aria-label="Close app">✕</button><strong id="title"></strong><button id="reload" aria-label="Reload app">↻</button><button id="edit">Edit</button></div><div class="frame-slot"><iframe id="appFrame" title="Running app" sandbox="allow-scripts allow-forms allow-modals allow-downloads allow-popups allow-popups-to-escape-sandbox"></iframe></div></section>
+<section id="editor" hidden><div class="bar"><button id="cancel">Cancel</button><strong id="editorTitle">Add app</strong></div><div class="editor-body"><div class="fields"><div><label for="name">App name</label><input id="name" maxlength="80"></div><div><label for="icon">Icon</label><input id="icon" maxlength="12" value="A"></div><div><label for="color">Color</label><input id="color" type="color" value="#42669e"></div></div><div id="drop"><span>Drop an HTML file here, or choose a file.</span><button id="upload">Upload HTML</button></div><div class="tabs"><button class="active" id="codeTab">Code</button><button id="previewTab">Preview</button><button id="expand">Open full screen</button></div><textarea id="code" spellcheck="false" aria-label="HTML source" placeholder="Paste your HTML here"></textarea><div id="previewBox" hidden><iframe id="preview" title="Code preview" sandbox="allow-scripts allow-forms allow-modals allow-downloads allow-popups allow-popups-to-escape-sandbox"></iframe></div><p class="note">Each saved app has its own persistent localStorage compatibility layer. Backups include app data. Preview changes use a temporary copy and do not change saved app data.</p><button id="clearData" class="danger">Clear this app’s saved data</button><span id="dataInfo" class="note"></span></div><footer><button class="danger" id="remove">Delete app</button><button id="save">Save app</button></footer></section><input type="file" id="htmlFile" accept=".html,.htm,.txt,text/html" hidden><input type="file" id="jsonFile" accept=".json,application/json" hidden><div id="toast" role="status" hidden></div>
+<script>
+'use strict';
+const $=id=>document.getElementById(id),KEY='apphome.apps.v4';let apps=[],editing=null,current=null,previewing=false;const sessions=new Map();
+function uid(){return globalThis.crypto&&crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2)}
+function say(text){$('toast').textContent=text;$('toast').hidden=false;clearTimeout(say.timer);say.timer=setTimeout(()=>$('toast').hidden=true,4000)}
+function dictionary(source){const out=Object.create(null);if(source&&typeof source==='object'&&!Array.isArray(source))for(const k of Object.keys(source))out[k]=String(source[k]);return out}
+function normalize(a){return {id:uid(),name:String(a.name||'Untitled'),icon:String(a.icon||'A'),colorOne:/^#[0-9a-f]{6}$/i.test(a.colorOne||a.c1||'')?(a.colorOne||a.c1):'#42669e',code:a.code,data:dictionary(a.data||a.localStorage)}}
+try{let raw=localStorage.getItem(KEY);if(raw===null)for(const k of ['apphome.apps.v3','apphome.apps.v2','apphome_apps_v1']){raw=localStorage.getItem(k);if(raw!==null)break}if(raw){const data=JSON.parse(raw);if(Array.isArray(data))apps=data.filter(a=>a&&typeof a.code==='string').map(normalize)}}catch(e){say('Storage unavailable or unreadable. Import a backup to restore your apps.')}
+function persist(next){try{localStorage.setItem(KEY,JSON.stringify(next));apps=next;return true}catch(e){say('Save failed: storage is full or unavailable. Export a backup before closing.');return false}}
+function render(){const q=$('search').value.toLowerCase();$('grid').replaceChildren();const visible=apps.filter(a=>a.name.toLowerCase().includes(q));$('empty').hidden=visible.length>0;visible.forEach(a=>{const b=document.createElement('button');b.className='tile';const i=document.createElement('span');i.className='icon';i.textContent=a.icon;i.style.setProperty('--color',a.colorOne);const t=document.createElement('span');t.className='label';t.textContent=a.name;b.append(i,t);b.onclick=()=>open(a);$('grid').append(b)})}
+function storageBridge(seed,token){
+ const values=Object.assign(Object.create(null),seed);
+ function send(){parent.postMessage({type:'apphome:storage',token:token,data:values},'*')}
+ const methods={
+ getItem(key){key=String(key);return Object.prototype.hasOwnProperty.call(values,key)?values[key]:null},
+ setItem(key,value){if(arguments.length<2)throw new TypeError('setItem requires two arguments');values[String(key)]=String(value);send()},
+ removeItem(key){delete values[String(key)];send()},clear(){for(const k of Object.keys(values))delete values[k];send()},
+ key(index){return Object.keys(values)[Number(index)>>>0]??null}
+ };
+ const storage=new Proxy(Object.create(null),{
+ get(target,key){if(key==='length')return Object.keys(values).length;if(key===Symbol.toStringTag)return 'Storage';if(Object.prototype.hasOwnProperty.call(methods,key))return methods[key];return typeof key==='string'&&Object.prototype.hasOwnProperty.call(values,key)?values[key]:undefined},
+ set(target,key,value){if(typeof key!=='string')return false;values[key]=String(value);send();return true},
+ deleteProperty(target,key){delete values[key];send();return true},
+ ownKeys(){return Object.keys(values)},
+ has(target,key){return key==='length'||Object.prototype.hasOwnProperty.call(methods,key)||Object.prototype.hasOwnProperty.call(values,key)},
+ getOwnPropertyDescriptor(target,key){if(Object.prototype.hasOwnProperty.call(values,key))return {value:values[key],writable:true,enumerable:true,configurable:true}},
+ defineProperty(target,key,descriptor){if('value' in descriptor){values[key]=String(descriptor.value);send();return true}return false}
+ });
+ Object.defineProperty(window,'localStorage',{value:storage,configurable:false,writable:false});
+}
+function safeJSON(value){return JSON.stringify(value).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029')}
+function mount(frame,app,temporary){
+ const token=uid();const previous=frame.dataset.session;if(previous)sessions.delete(previous);frame.dataset.session=token;
+ sessions.set(token,{source:frame.contentWindow,app,temporary});
+ const doc=new DOMParser().parseFromString(app.code,'text/html');
+ if(!doc.querySelector('meta[name="viewport" i]')){const m=doc.createElement('meta');m.name='viewport';m.content='width=device-width,initial-scale=1';doc.head.prepend(m)}
+ const script=doc.createElement('script');script.textContent='('+storageBridge.toString()+')('+safeJSON(dictionary(app.data))+','+safeJSON(token)+');';doc.head.prepend(script);
+ frame.srcdoc='<!doctype html>\n'+doc.documentElement.outerHTML;
+}
+window.addEventListener('message',event=>{
+ const msg=event.data;if(!msg||msg.type!=='apphome:storage'||typeof msg.token!=='string')return;
+ const session=sessions.get(msg.token);if(!session||event.source!==session.source||!msg.data||typeof msg.data!=='object'||Array.isArray(msg.data))return;
+ session.app.data=dictionary(msg.data);
+ if(!session.temporary&&apps.some(a=>a===session.app))persist(apps);
+});
+function open(a,temp=false){current=a;previewing=temp;$('title').textContent=a.name;$('viewer').hidden=false;document.body.classList.add('running');mount($('appFrame'),a,temp);$('edit').hidden=temp}
+function exit(){$('viewer').hidden=true;$('appFrame').srcdoc='';current=null;document.body.classList.remove('running')}
+function previewApp(){const source=apps.find(a=>a.id===editing);return {name:$('name').value||'Preview',code:$('code').value,data:dictionary(source?source.data:null)}}
+function tab(show){$('code').hidden=show;$('previewBox').hidden=!show;$('codeTab').classList.toggle('active',!show);$('previewTab').classList.toggle('active',show);if(show)mount($('preview'),previewApp(),true);else $('preview').srcdoc=''}
+function info(){const a=apps.find(a=>a.id===editing);$('dataInfo').textContent=' '+Object.keys(a?a.data:{}).length+' saved keys';$('clearData').hidden=!a}
+function editor(a){editing=a?a.id:null;$('editorTitle').textContent=a?'Edit app':'Add app';$('name').value=a?a.name:'';$('icon').value=a?a.icon:'A';$('color').value=a?a.colorOne:'#42669e';$('code').value=a?a.code:'';$('remove').hidden=!a;$('editor').hidden=false;info();tab(false)}
+function closeEditor(){$('editor').hidden=true;$('preview').srcdoc='';editing=null}
+$('add').onclick=()=>editor(null);$('search').oninput=render;$('exit').onclick=exit;$('reload').onclick=()=>{if(current)open(current,previewing)};$('edit').onclick=()=>{const a=current;exit();editor(a)};$('cancel').onclick=()=>{if($('code').value.trim()&&!confirm('Close the editor without saving code changes?'))return;closeEditor()};$('codeTab').onclick=()=>tab(false);$('previewTab').onclick=()=>tab(true);$('expand').onclick=()=>{if(!$('code').value.trim())return say('Add HTML first.');open(previewApp(),true)};
+$('save').onclick=()=>{if(!$('name').value.trim()||!$('code').value.trim())return say('Enter a name and add HTML code.');const old=apps.find(a=>a.id===editing);const a={id:editing||uid(),name:$('name').value.trim(),icon:$('icon').value||'A',colorOne:$('color').value,code:$('code').value,data:dictionary(old?old.data:null)};const next=editing?apps.map(x=>x.id===editing?a:x):[a,...apps];if(persist(next)){closeEditor();render();say('App saved.')}};
+$('remove').onclick=()=>{if(editing&&confirm('Permanently delete this app and its saved data?')&&persist(apps.filter(a=>a.id!==editing))){closeEditor();render()}};
+$('clearData').onclick=()=>{const a=apps.find(a=>a.id===editing);if(a&&confirm('Clear saved data for '+a.name+'? HTML code will be kept.')){const old=a.data;a.data=dictionary(null);if(!persist(apps))a.data=old;info();tab(false)}};
+async function loadFile(f){if(!f)return;if(!/\.(html?|txt)$/i.test(f.name))return say('Choose an HTML or text file.');if($('code').value.trim()&&!confirm('Replace the current editor code with this file?'))return;try{$('code').value=await f.text();if(!$('name').value.trim())$('name').value=f.name.replace(/\.[^.]+$/,'');tab(false);say('HTML loaded.')}catch(e){say('Could not read the file.')}}
+$('upload').onclick=()=>$('htmlFile').click();$('htmlFile').onchange=e=>{loadFile(e.target.files[0]);e.target.value=''};for(const id of ['drop','code']){const el=$(id);el.ondragover=e=>{if(Array.from(e.dataTransfer.types).includes('Files')){e.preventDefault();$('drop').classList.add('over')}};el.ondragleave=()=>$('drop').classList.remove('over');el.ondrop=e=>{if(e.dataTransfer.files.length){e.preventDefault();loadFile(e.dataTransfer.files[0])}$('drop').classList.remove('over')}}
+document.addEventListener('dragover',e=>{if(Array.from(e.dataTransfer.types).includes('Files'))e.preventDefault()});document.addEventListener('drop',e=>{if(e.dataTransfer.files.length)e.preventDefault()});
+$('backup').onclick=()=>{const u=URL.createObjectURL(new Blob([JSON.stringify(apps,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download='apphome-backup.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)};$('restore').onclick=()=>$('jsonFile').click();$('jsonFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data)||!data.every(a=>a&&typeof a.name==='string'&&typeof a.code==='string'))throw Error();if(!confirm('Add '+data.length+' apps, including their saved data, to your library?'))return;if(persist([...apps,...data.map(normalize)])){render();say('Backup imported.')}}catch(err){say('Invalid or unreadable backup.')}};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('viewer').hidden)exit();else if(!$('editor').hidden)$('cancel').click()}});render();
+</script></body></html>
